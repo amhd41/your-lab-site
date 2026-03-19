@@ -59,19 +59,43 @@ for (const k of Object.keys(grouped)) {
 const sectionOrder = ["Senior Personnel", "Graduate Students", "Undergraduate Assistants", "Other"];
 const showOther = grouped["Other"].length > 0;
 
+const base = import.meta.env.BASE_URL;
+
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "People", href: "/people" },
-  { label: "Research", href: "/research" },
-  { label: "Projects", href: "/projects" },
-  { label: "Publications", href: "/publications" },
-  { label: "News", href: "/news" },
-  { label: "Join", href: "/join" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: `${base}` },
+  { label: "People", href: `${base}/people` },
+  { label: "Research", href: `${base}/research` },
+  { label: "Projects", href: `${base}/projects` },
+  { label: "Publications", href: `${base}/publications` },
+  { label: "News", href: `${base}/news` },
+  { label: "Join", href: `${base}/join` },
+  { label: "Contact", href: `${base}contact` },
 ];
 
 const pathname = Astro.url.pathname;
-const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+const stripBase = (path) => {
+  if (base !== "/" && path.startsWith(base)) {
+    return path.slice(base.length - 1);
+  }
+  return path;
+};
+
+const localPath = stripBase(pathname);
+
+const active = (href) => {
+  const localHref = stripBase(href);
+  return localHref === "/" ? localPath === "/" : localPath.startsWith(localHref);
+};
+
+const withBase = (path = "") => {
+  if (!path) return "";
+  if (/^(https?:)?\/\//.test(path) || path.startsWith("mailto:")) return path;
+  const cleaned = path.startsWith("/") ? path.slice(1) : path;
+  return `${base}${cleaned}`;
+};
+
+const placeholderImage = `${base}uploads/placeholder.jpg`;
 ---
 
 <style>
@@ -506,11 +530,11 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
 
 <header class="topbar">
   <div class="navWrap">
-    <a class="brand" href="/">
+    <a class="brand" href={base}>
       <span class="logoWrap" aria-hidden="true">
-        <img class="logo" src="/uploads/logo.png" alt="" />
+        <img class="logo" src={`${base}uploads/logo.png`} alt="" />
       </span>
-      <span class="brandText"><strong>Structure</strong> System AI</span>
+      <span class="brandText"><strong>Systems</strong> Structural Biology Group</span>
     </a>
 
     <button class="menuBtn" type="button" data-menu-btn aria-expanded="false" aria-controls="mainnav">
@@ -558,9 +582,11 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
                 <div class="top">
                   <img
                     class="avatar"
-                    src={p.data.photo ?? "/uploads/placeholder.jpg"}
+                    src={withBase(p.data.photo ?? "uploads/placeholder.jpg")}
                     alt={`${p.data.name} headshot`}
                     loading="lazy"
+                    data-fallback={placeholderImage}
+                    onerror="this.onerror=null;this.src=this.dataset.fallback;"
                   />
                   <div>
                     <h3 class="name">{p.data.name}</h3>
@@ -589,9 +615,11 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
                       {p.data.links?.scholar_preview_image ? (
                         <img
                           class="scholarPreviewImage"
-                          src={p.data.links.scholar_preview_image}
+                          src={withBase(p.data.links.scholar_preview_image)}
                           alt={`${p.data.name} Google Scholar preview`}
                           loading="lazy"
+                          data-fallback={placeholderImage}
+                          onerror="this.onerror=null;this.src=this.dataset.fallback;"
                         />
                       ) : (
                         <div class="scholarFallback">
@@ -645,13 +673,14 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
 <footer class="footer">
   <div class="footerRow">
     <div class="footerBrand">
-      <img class="footerLogo" src="/uploads/logo.png" alt="Structure System AI logo" />
-      <div>© {new Date().getFullYear()} Structure System AI</div>
+      <img class="footerLogo" src={`${base}uploads/logo.png`} alt="Systems Structural Biology Group logo" />
+      <div>© {new Date().getFullYear()} Systems Structural Biology Group</div>
     </div>
     <div class="footerLinks">
-      <a href="/about">About</a>
-      <a href="/join">Join</a>
-      <a href="/contact">Contact</a>
+      <a href={`${base}people`}>People</a>
+      <a href={`${base}publications`}>Publications</a>
+      <a href={`${base}join`}>Join</a>
+      <a href={`${base}contact`}>Contact</a>
     </div>
   </div>
 </footer>

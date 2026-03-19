@@ -1,19 +1,34 @@
 ---
 import { publications } from "../../data/publications.js";
 
+const base = import.meta.env.BASE_URL;
+
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "People", href: "/people" },
-  { label: "Research", href: "/research" },
-  { label: "Projects", href: "/projects" },
-  { label: "Publications", href: "/publications" },
-  { label: "News", href: "/news" },
-  { label: "Join", href: "/join" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: `${base}` },
+  { label: "People", href: `${base}/people` },
+  { label: "Research", href: `${base}/research` },
+  { label: "Projects", href: `${base}/projects` },
+  { label: "Publications", href: `${base}/publications` },
+  { label: "News", href: `${base}/news` },
+  { label: "Join", href: `${base}/join` },
+  { label: "Contact", href: `${base}/contact` },
 ];
 
 const pathname = Astro.url.pathname;
-const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+const stripBase = (path) => {
+  if (base !== "/" && path.startsWith(base)) {
+    return path.slice(base.length - 1);
+  }
+  return path;
+};
+
+const localPath = stripBase(pathname);
+
+const active = (href) => {
+  const localHref = stripBase(href);
+  return localHref === "/" ? localPath === "/" : localPath.startsWith(localHref);
+};
 
 const sorted = [...publications].sort((a, b) => {
   if (b.year !== a.year) return b.year - a.year;
@@ -305,9 +320,9 @@ const years = Object.keys(grouped)
 
 <header class="topbar">
   <div class="navWrap">
-    <a class="brand" href="/">
+    <a class="brand" href={base}>
       <span class="logoWrap" aria-hidden="true">
-        <img class="logo" src="/uploads/logo.png" alt="" />
+        <img class="logo" src={`${base}uploads/logo.png`} alt="" />
       </span>
       <span class="brandText"><strong>Systems</strong> Structural Biology Group</span>
     </a>
@@ -370,14 +385,14 @@ const years = Object.keys(grouped)
 <footer class="footer">
   <div class="footerRow">
     <div class="footerBrand">
-      <img class="footerLogo" src="/uploads/logo.png" alt="Systems Structural Biology Group logo" />
+      <img class="footerLogo" src={`${base}uploads/logo.png`} alt="Systems Structural Biology Group logo" />
       <div>© {new Date().getFullYear()} Systems Structural Biology Group</div>
     </div>
     <div class="footerLinks">
-      <a href="/people">People</a>
-      <a href="/research">Research</a>
-      <a href="/join">Join</a>
-      <a href="/contact">Contact</a>
+      <a href={`${base}people`}>People</a>
+      <a href={`${base}research`}>Research</a>
+      <a href={`${base}join`}>Join</a>
+      <a href={`${base}contact`}>Contact</a>
     </div>
   </div>
 </footer>

@@ -1,4 +1,13 @@
 ---
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path = "") => {
+  if (!path) return "";
+  if (/^(https?:)?\/\//.test(path) || path.startsWith("mailto:") || path.startsWith("#")) return path;
+  const cleaned = path.startsWith("/") ? path.slice(1) : path;
+  return `${base}${cleaned}`;
+};
+
 const projects = [
   {
     id: "coordination-integrity",
@@ -11,9 +20,9 @@ const projects = [
     timeline: "2026–2028",
     lead: "Abhishek Singharoy",
     team: [
-      { name: "Abhishek Singharoy", role: "Principal Investigator", href: "/people#abhishek-singharoy" },
-      { name: "Caleb James Armstrong", role: "Research Scientist", href: "/people#caleb-james-armstrong" },
-      { name: "Chun Kit Chan", role: "Postdoctoral Research Scholar", href: "/people#chun-kit-chan" },
+      { name: "Abhishek Singharoy", role: "Principal Investigator", href: "people#abhishek-singharoy" },
+      { name: "Caleb James Armstrong", role: "Research Scientist", href: "people#caleb-james-armstrong" },
+      { name: "Chun Kit Chan", role: "Postdoctoral Research Scholar", href: "people#chun-kit-chan" },
     ],
     updates: [
       "Streaming telemetry preprocessing pipeline finalized.",
@@ -31,9 +40,9 @@ const projects = [
     timeline: "2025–2027",
     lead: "Caleb James Armstrong",
     team: [
-      { name: "Caleb James Armstrong", role: "Project Lead", href: "/people#caleb-james-armstrong" },
-      { name: "Abhishek Singharoy", role: "Principal Investigator", href: "/people#abhishek-singharoy" },
-      { name: "Graduate Research Team", role: "Modeling and validation", href: "/people" },
+      { name: "Caleb James Armstrong", role: "Project Lead", href: "people#caleb-james-armstrong" },
+      { name: "Abhishek Singharoy", role: "Principal Investigator", href: "people#abhishek-singharoy" },
+      { name: "Graduate Research Team", role: "Modeling and validation", href: "people" },
     ],
     updates: [
       "Ground-truth workflow refined for pilot participants.",
@@ -51,9 +60,9 @@ const projects = [
     timeline: "2025–2026",
     lead: "Caleb James Armstrong",
     team: [
-      { name: "Caleb James Armstrong", role: "Research Scientist", href: "/people#caleb-james-armstrong" },
-      { name: "Chun Kit Chan", role: "Computational and ML Support", href: "/people#chun-kit-chan" },
-      { name: "Clinical and ML Teams", role: "Clinical implementation and model support", href: "/people" },
+      { name: "Caleb James Armstrong", role: "Research Scientist", href: "people#caleb-james-armstrong" },
+      { name: "Chun Kit Chan", role: "Computational and ML Support", href: "people#chun-kit-chan" },
+      { name: "Clinical and ML Teams", role: "Clinical implementation and model support", href: "people" },
     ],
     updates: [
       "Daily survey integration and lag-effect modeling in progress.",
@@ -70,18 +79,31 @@ const stats = [
 ];
 
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "People", href: "/people" },
-  { label: "Research", href: "/research" },
-  { label: "Projects", href: "/projects" },
-  { label: "Publications", href: "/publications" },
-  { label: "News", href: "/news" },
-  { label: "Join", href: "/join" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: `${base}` },
+  { label: "People", href: `${base}/people` },
+  { label: "Research", href: `${base}/research` },
+  { label: "Projects", href: `${base}/projects` },
+  { label: "Publications", href: `${base}/publications` },
+  { label: "News", href: `${base}/news` },
+  { label: "Join", href: `${base}/join` },
+  { label: "Contact", href: `${base}/contact` },
 ];
 
 const pathname = Astro.url.pathname;
-const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+const stripBase = (path) => {
+  if (base !== "/" && path.startsWith(base)) {
+    return path.slice(base.length - 1);
+  }
+  return path;
+};
+
+const localPath = stripBase(pathname);
+
+const active = (href) => {
+  const localHref = stripBase(href);
+  return localHref === "/" ? localPath === "/" : localPath.startsWith(localHref);
+};
 ---
 
 <style>
@@ -589,11 +611,11 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
 
 <header class="topbar">
   <div class="navWrap">
-    <a class="brand" href="/">
+    <a class="brand" href={base}>
       <span class="logoWrap" aria-hidden="true">
-        <img class="logo" src="/uploads/logo.png" alt="" />
+        <img class="logo" src={`${base}uploads/logo.png`} alt="" />
       </span>
-      <span class="brandText"><strong>Structure</strong> System AI</span>
+      <span class="brandText"><strong>Systems</strong> Structural Biology Group</span>
     </a>
 
     <button class="menuBtn" type="button" data-menu-btn aria-expanded="false" aria-controls="mainnav">
@@ -614,7 +636,7 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
   <section class="hero">
     <div class="heroGrid">
       <div>
-        <p class="kicker">Structure System AI</p>
+        <p class="kicker">Systems Structural Biology Group</p>
         <h1>Active Projects</h1>
         <p class="sub">
           A shared view of ongoing research, current progress, and project teams.
@@ -624,7 +646,7 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
 
         <div class="heroButtons">
           <a href="#projects" class="btn btnPrimary">Browse projects</a>
-          <a href="/people" class="btn btnSecondary">View people</a>
+          <a href={`${base}people`} class="btn btnSecondary">View people</a>
         </div>
       </div>
 
@@ -726,7 +748,7 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
                 <p class="sideLabel">Team members</p>
                 <div style="margin-top:.8rem; display:grid; gap:.65rem;">
                   {project.team.map((member) => (
-                    <a href={member.href} class="memberLink">
+                    <a href={withBase(member.href)} class="memberLink">
                       <p class="memberName">{member.name}</p>
                       <p class="memberRole">{member.role}</p>
                     </a>
@@ -753,13 +775,14 @@ const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(
 <footer class="footer">
   <div class="footerRow">
     <div class="footerBrand">
-      <img class="footerLogo" src="/uploads/logo.png" alt="Structure System AI logo" />
-      <div>© {new Date().getFullYear()} Structure System AI</div>
+      <img class="footerLogo" src={`${base}uploads/logo.png`} alt="Systems Structural Biology Group logo" />
+      <div>© {new Date().getFullYear()} Systems Structural Biology Group</div>
     </div>
     <div class="footerLinks">
-      <a href="/about">About</a>
-      <a href="/join">Join</a>
-      <a href="/contact">Contact</a>
+      <a href={`${base}people`}>People</a>
+      <a href={`${base}publications`}>Publications</a>
+      <a href={`${base}join`}>Join</a>
+      <a href={`${base}contact`}>Contact</a>
     </div>
   </div>
 </footer>

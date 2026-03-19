@@ -2,19 +2,41 @@
 // src/pages/research/index.astro
 // Research page for "Systems Structural Biology Group"
 
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path = "") => {
+  if (!path) return "";
+  if (/^(https?:)?\/\//.test(path) || path.startsWith("mailto:") || path.startsWith("#")) return path;
+  const cleaned = path.startsWith("/") ? path.slice(1) : path;
+  return `${base}${cleaned}`;
+};
+
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "People", href: "/people" },
-  { label: "Research", href: "/research" },
-  { label: "Projects", href: "/projects" },
-  { label: "Publications", href: "/publications" },
-  { label: "News", href: "/news" },
-  { label: "Join", href: "/join" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: `${base}` },
+  { label: "People", href: `${base}/people` },
+  { label: "Research", href: `${base}/research` },
+  { label: "Projects", href: `${base}/projects` },
+  { label: "Publications", href: `${base}/publications` },
+  { label: "News", href: `${base}/news` },
+  { label: "Join", href: `${base}/join` },
+  { label: "Contact", href: `${base}/contact` },
 ];
 
 const pathname = Astro.url.pathname;
-const active = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+const stripBase = (path) => {
+  if (base !== "/" && path.startsWith(base)) {
+    return path.slice(base.length - 1);
+  }
+  return path;
+};
+
+const localPath = stripBase(pathname);
+
+const active = (href) => {
+  const localHref = stripBase(href);
+  return localHref === "/" ? localPath === "/" : localPath.startsWith(localHref);
+};
 
 const focusAreas = [
   {
@@ -73,7 +95,7 @@ const motionCards = [
       "Protein sequences encode more than stationary structures seen in databanks; they encode an ensemble of molecular movements whose landscape determines function.",
     body2:
       "Tracking these motions offers a new lens on evolution and opens pathways toward engineering protein movements beyond nature.",
-    image: "/uploads/folding-protein-darpa-program-nodes.gif",
+    image: "uploads/folding-protein-darpa-program-nodes.gif",
     alt: "Folding landscape of disordered proteins on the surface of protein supercomplexes.",
     caption:
       "Folding landscape of disordered proteins on protein supercomplexes."
@@ -84,7 +106,7 @@ const motionCards = [
       "Diffusion-driven protein-protein interactions create rate-determining bottlenecks in biological functions such as signaling, recognition, and pathogenicity.",
     body2:
       "These pathways can be engineered to study infectivity and to guide the design of medical countermeasures.",
-    image: "/uploads/binding-protein-darpa-program-nodes-2025.gif",
+    image: "uploads/binding-protein-darpa-program-nodes-2025.gif",
     alt: "Binding of chemokine proteins on surface of the SARS-CoV2 ChAdOX vaccine vector.",
     caption:
       "Chemokine binding on the ChAdOx vaccine vector surface."
@@ -95,7 +117,7 @@ const motionCards = [
       "Beyond internal dynamics, protein function depends on modifications and environmental changes through cooperative and allosteric coupling that can also be chemomechanical.",
     body2:
       "Cooperativity controls protein movements in cellular environments and can be harnessed for biomolecular engineering and manufacturing benefits.",
-    image: "/uploads/cooperativity-protein-darpa-program-nodes.gif",
+    image: "uploads/cooperativity-protein-darpa-program-nodes.gif",
     alt: "Proton-motive force driven coupled rotation in integral-membrane molecular motors.",
     caption:
       "Coupled rotation in integral-membrane molecular motors."
@@ -107,8 +129,8 @@ const featuredStillImages = [
     title: "Energy storage and viral surfaces",
     text:
       "From motor energetics to adenovirus surface properties, our work links physical mechanisms to biomedical function.",
-    imageLeft: "/uploads/brownian-ratchets-motors.png",
-    imageRight: "/uploads/adenovirus-surface-electrostatics.png",
+    imageLeft: "uploads/brownian-ratchets-motors.png",
+    imageRight: "uploads/adenovirus-surface-electrostatics.png",
     altLeft: "Brownian ratchet mechanisms across molecular motors.",
     altRight: "Surface electrostatic properties of adenovirus capsids.",
     captionLeft: "Brownian-ratchet motor mechanisms.",
@@ -118,8 +140,8 @@ const featuredStillImages = [
     title: "From organelles to crowded membranes",
     text:
       "We extend molecular dynamics from single molecules to organelles and dense membrane environments to study energy transfer at biological scale.",
-    imageLeft: "/uploads/matter-organelle-cover.png",
-    imageRight: "/uploads/crowded-membrane-energy-transfer.png",
+    imageLeft: "uploads/matter-organelle-cover.png",
+    imageRight: "uploads/crowded-membrane-energy-transfer.png",
     altLeft: "Whole-organelle molecular dynamics illustration.",
     altRight: "Crowded membrane energy-transfer modeling.",
     captionLeft: "Whole-organelle molecular dynamics.",
@@ -142,7 +164,7 @@ const relatedResearch = [
     title:
       "Adaptive Artificial Intelligence to Teach Interactive Molecular Dynamics in the Context of Human-Computer Interaction",
     href:
-      "/Adaptive_Artificial_Intelligence_to_Teach_Interact.pdf",
+      "Adaptive_Artificial_Intelligence_to_Teach_Interact.pdf",
     meta:
       "Conference paper / uploaded PDF",
     description:
@@ -706,9 +728,9 @@ const relatedResearch = [
 
 <header class="topbar">
   <div class="navWrap">
-    <a class="brand" href="/">
+    <a class="brand" href={base}>
       <span class="logoWrap" aria-hidden="true">
-        <img class="logo" src="/uploads/logo.png" alt="" />
+        <img class="logo" src={`${base}uploads/logo.png`} alt="" />
       </span>
       <span class="brandText"><strong>Systems</strong> Structural Biology Group</span>
     </a>
@@ -735,7 +757,7 @@ const relatedResearch = [
       Our laboratory studies the molecular origins of life by integrating structural biology,
       molecular dynamics, machine learning, and high-performance computing. We seek to understand
       how energy transfer, conformational change, and cooperative dynamics generate biological
-      function; and how these principles can be translated into health, disease, and therapeutic design.
+      function, and how these principles can be translated into health, disease, and therapeutic design.
     </p>
 
     <div class="chips">
@@ -748,9 +770,9 @@ const relatedResearch = [
     </div>
 
     <div class="ctaRow">
-      <a class="btn primary" href="/projects">See Projects</a>
-      <a class="btn" href="/publications">View Publications</a>
-      <a class="btn" href="/people">Collaborators & Team</a>
+      <a class="btn primary" href={`${base}projects`}>See Projects</a>
+      <a class="btn" href={`${base}/publications`}>View Publications</a>
+      <a class="btn" href={`${base}/people`}>Collaborators & Team</a>
     </div>
   </section>
 
@@ -848,11 +870,11 @@ const relatedResearch = [
       <article class="featuredImageCard">
         <div class="featuredImageGrid">
           <div class="featuredImagePanel">
-            <img src={item.imageLeft} alt={item.altLeft} loading="lazy" />
+            <img src={withBase(item.imageLeft)} alt={item.altLeft} loading="lazy" />
             <p class="featuredImageCaption">{item.captionLeft}</p>
           </div>
           <div class="featuredImagePanel">
-            <img src={item.imageRight} alt={item.altRight} loading="lazy" />
+            <img src={withBase(item.imageRight)} alt={item.altRight} loading="lazy" />
             <p class="featuredImageCaption">{item.captionRight}</p>
           </div>
         </div>
@@ -886,14 +908,14 @@ const relatedResearch = [
                 <p>{card.body2}</p>
               </div>
               <div class="motionMedia">
-                <img class="motionImage" src={card.image} alt={card.alt} loading="lazy" />
+                <img class="motionImage" src={withBase(card.image)} alt={card.alt} loading="lazy" />
                 <p class="motionCaption">{card.caption}</p>
               </div>
             </>
           ) : (
             <>
               <div class="motionMedia">
-                <img class="motionImage" src={card.image} alt={card.alt} loading="lazy" />
+                <img class="motionImage" src={withBase(card.image)} alt={card.alt} loading="lazy" />
                 <p class="motionCaption">{card.caption}</p>
               </div>
               <div class="motionText">
@@ -916,7 +938,11 @@ const relatedResearch = [
       <div class="relatedList">
         {relatedResearch.map((item) => (
           <div class="relatedItem">
-            <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}>
+            <a
+              href={withBase(item.href)}
+              target={item.href.startsWith("http") ? "_blank" : undefined}
+              rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+            >
               {item.title}
             </a>
             <div class="relatedMeta">{item.meta}</div>
@@ -931,14 +957,14 @@ const relatedResearch = [
 <footer class="footer">
   <div class="footerRow">
     <div class="footerBrand">
-      <img class="footerLogo" src="/uploads/logo.png" alt="Systems Structural Biology Group logo" />
+      <img class="footerLogo" src={`${base}uploads/logo.png`} alt="Systems Structural Biology Group logo" />
       <div>© {new Date().getFullYear()} Systems Structural Biology Group</div>
     </div>
     <div class="footerLinks">
-      <a href="/people">People</a>
-      <a href="/publications">Publications</a>
-      <a href="/join">Join</a>
-      <a href="/contact">Contact</a>
+      <a href={`${base}/people`}>People</a>
+      <a href={`${base}/publications`}>Publications</a>
+      <a href={`${base}/join`}>Join</a>
+      <a href={`${base}/contact`}>Contact</a>
     </div>
   </div>
 </footer>
