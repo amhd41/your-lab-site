@@ -1,0 +1,245 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { withBase as withSiteBase } from "../../lib/site";
+
+const base = import.meta.env.BASE_URL;
+const withBase = (path = "") => withSiteBase(base, path);
+
+const opportunities = [
+  {
+    title: "Graduate researchers",
+    description:
+      "Students interested in structural biology, molecular simulation, interpretable machine learning, or human-centered AI are encouraged to reach out with research interests and prior experience.",
+  },
+  {
+    title: "Undergraduate assistants",
+    description:
+      "We welcome motivated undergraduates who want hands-on exposure to computational science, data analysis, scientific software, and interdisciplinary research workflows.",
+  },
+  {
+    title: "Collaborators",
+    description:
+      "We are interested in collaborations spanning structural discovery, biophysics, visualization, machine learning, digital health, and complex systems research.",
+  },
+];
+
+const expectations = [
+  "A short note describing your interests and what drew you to the lab.",
+  "A CV or resume highlighting coursework, projects, publications, or technical skills.",
+  "Relevant links such as GitHub, Google Scholar, LinkedIn, or a portfolio when available.",
+];
+
+const focusAreas = [
+  "Structural biology and molecular dynamics",
+  "Machine learning for scientific discovery",
+  "Human-centered AI and decision support",
+  "Multiscale modeling and complex systems",
+];
+---
+
+<style>
+  .wrap{
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 2.2rem 1.25rem 3.2rem;
+  }
+  .hero{
+    border-radius: 28px;
+    padding: 2.6rem 2.2rem;
+    background:
+      radial-gradient(1200px 520px at 10% 0%, rgba(99,102,241,.24), transparent 55%),
+      radial-gradient(900px 520px at 100% 0%, rgba(16,185,129,.18), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 18px 46px rgba(0,0,0,.08);
+  }
+  .kicker{
+    font-size: .92rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.55);
+    margin: 0 0 .55rem;
+  }
+  h1{
+    margin: 0;
+    font-size: 3rem;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+  .lead{
+    margin: .9rem 0 0;
+    max-width: 74ch;
+    font-size: 1.15rem;
+    line-height: 1.68;
+    color: rgba(0,0,0,.72);
+  }
+  .ctaRow{
+    display:flex;
+    gap:.75rem;
+    flex-wrap:wrap;
+    margin-top: 1.25rem;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    font-weight:700;
+    border-radius:999px;
+    padding:.72rem 1.02rem;
+    border:1px solid rgba(0,0,0,.10);
+    background: rgba(255,255,255,.92);
+    color: rgba(0,0,0,.86);
+  }
+  .btn.primary{
+    background: rgba(0,0,0,.92);
+    border-color: rgba(0,0,0,.92);
+    color: rgba(255,255,255,.96);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 1.2rem;
+    margin-top: 1.3rem;
+  }
+  .stack{
+    display:grid;
+    gap: 1.2rem;
+  }
+  .card{
+    border-radius: 24px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 12px 28px rgba(0,0,0,.07);
+    padding: 1.3rem;
+  }
+  .card h2{
+    margin: 0 0 .75rem;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+  }
+  .card p{
+    margin: 0;
+    color: rgba(0,0,0,.74);
+    line-height: 1.7;
+    font-size: 1.03rem;
+  }
+  .opportunityList,
+  .plainList{
+    display:grid;
+    gap: .9rem;
+    margin-top: .95rem;
+  }
+  .miniCard{
+    padding: 1rem;
+    border-radius: 18px;
+    background: rgba(0,0,0,.03);
+    border: 1px solid rgba(0,0,0,.05);
+  }
+  .miniCard h3{
+    margin: 0 0 .45rem;
+    font-size: 1.05rem;
+  }
+  .plainList li{
+    color: rgba(0,0,0,.74);
+    line-height: 1.7;
+  }
+  .focusRow{
+    display:flex;
+    gap:.6rem;
+    flex-wrap:wrap;
+    margin-top: 1rem;
+  }
+  .chip{
+    padding:.48rem .78rem;
+    border-radius:999px;
+    background: rgba(255,255,255,.82);
+    border: 1px solid rgba(0,0,0,.09);
+    color: rgba(0,0,0,.68);
+  }
+
+  @media (max-width: 980px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px){
+    .wrap{ padding: 1.6rem 1rem 2.8rem; }
+    .hero{ padding: 2rem 1.35rem; }
+    h1{ font-size: 2.3rem; }
+  }
+</style>
+
+<SiteLayout title="Join | Systems Structural Biology Group">
+  <main class="wrap">
+    <section class="hero">
+      <p class="kicker">Join</p>
+      <h1>Build research with us.</h1>
+      <p class="lead">
+        We welcome students, trainees, and collaborators interested in structural discovery,
+        molecular simulation, machine learning, and human-centered AI. If our work aligns with
+        your interests, we would be glad to hear from you.
+      </p>
+      <div class="ctaRow">
+        <a class="btn primary" href="mailto:asinghar@asu.edu">Email the lab</a>
+        <a class="btn" href={withBase("/people")}>Meet the team</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <article class="card">
+          <h2>Who we are looking for</h2>
+          <p>
+            We are especially interested in people who enjoy rigorous interdisciplinary work,
+            clear communication, and building tools or models that connect scientific depth with
+            real research impact.
+          </p>
+          <div class="opportunityList">
+            {opportunities.map((item) => (
+              <div class="miniCard">
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Research directions</h2>
+          <p>
+            Current work spans computational structural biology, multiscale simulation,
+            adaptive AI systems, and interpretable modeling for complex scientific problems.
+          </p>
+          <div class="focusRow">
+            {focusAreas.map((item) => (
+              <span class="chip">{item}</span>
+            ))}
+          </div>
+        </article>
+      </div>
+
+      <div class="stack">
+        <article class="card">
+          <h2>What to send</h2>
+          <ul class="plainList">
+            {expectations.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Best way to reach out</h2>
+          <p>
+            The easiest way to start is by email. A concise introduction plus a resume or CV is
+            enough for an initial conversation.
+          </p>
+          <div class="ctaRow">
+            <a class="btn primary" href="mailto:asinghar@asu.edu?subject=Interest%20in%20Joining%20the%20Lab">Contact by email</a>
+            <a class="btn" href={withBase("/research")}>Explore research</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</SiteLayout>

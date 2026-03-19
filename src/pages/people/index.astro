@@ -1,6 +1,8 @@
 ---
 // src/pages/people.astro
 import { getCollection } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { uploadPath } from "../../lib/site";
 
 const peopleEntries = await getCollection("people");
 
@@ -50,7 +52,9 @@ const grouped = {
   "Other": [],
 };
 
-for (const p of peopleEntries) grouped[categorize(p.data.role)]?.push(p);
+for (const p of peopleEntries) {
+  grouped[categorize(p.data.role)]?.push(p);
+}
 
 for (const k of Object.keys(grouped)) {
   grouped[k].sort((a, b) => (a.data.name ?? "").localeCompare(b.data.name ?? ""));
@@ -60,42 +64,8 @@ const sectionOrder = ["Senior Personnel", "Graduate Students", "Undergraduate As
 const showOther = grouped["Other"].length > 0;
 
 const base = import.meta.env.BASE_URL;
-
-const navItems = [
-  { label: "Home", href: `${base}` },
-  { label: "People", href: `${base}/people` },
-  { label: "Research", href: `${base}/research` },
-  { label: "Projects", href: `${base}/projects` },
-  { label: "Publications", href: `${base}/publications` },
-  { label: "News", href: `${base}/news` },
-  { label: "Join", href: `${base}/join` },
-  { label: "Contact", href: `${base}contact` },
-];
-
-const pathname = Astro.url.pathname;
-
-const stripBase = (path) => {
-  if (base !== "/" && path.startsWith(base)) {
-    return path.slice(base.length - 1);
-  }
-  return path;
-};
-
-const localPath = stripBase(pathname);
-
-const active = (href) => {
-  const localHref = stripBase(href);
-  return localHref === "/" ? localPath === "/" : localPath.startsWith(localHref);
-};
-
-const withBase = (path = "") => {
-  if (!path) return "";
-  if (/^(https?:)?\/\//.test(path) || path.startsWith("mailto:")) return path;
-  const cleaned = path.startsWith("/") ? path.slice(1) : path;
-  return `${base}${cleaned}`;
-};
-
-const placeholderImage = `${base}uploads/placeholder.jpg`;
+const assetPath = (path = "") => uploadPath(base, path);
+const placeholderImage = assetPath("logo.png");
 ---
 
 <style>
@@ -528,29 +498,7 @@ const placeholderImage = `${base}uploads/placeholder.jpg`;
   .footerLinks a:hover { text-decoration: underline; }
 </style>
 
-<header class="topbar">
-  <div class="navWrap">
-    <a class="brand" href={base}>
-      <span class="logoWrap" aria-hidden="true">
-        <img class="logo" src={`${base}uploads/logo.png`} alt="" />
-      </span>
-      <span class="brandText"><strong>Systems</strong> Structural Biology Group</span>
-    </a>
-
-    <button class="menuBtn" type="button" data-menu-btn aria-expanded="false" aria-controls="mainnav">
-      Menu
-    </button>
-
-    <nav id="mainnav" class="navLinks" aria-label="Main navigation" data-nav>
-      {navItems.map((item) => (
-        <a class={`navA ${active(item.href) ? "active" : ""}`} href={item.href}>
-          {item.label}
-        </a>
-      ))}
-    </nav>
-  </div>
-</header>
-
+<SiteLayout title="People | Systems Structural Biology Group">
 <main class="wrap">
   <section class="hero">
     <p class="kicker">Our Team</p>
@@ -582,7 +530,7 @@ const placeholderImage = `${base}uploads/placeholder.jpg`;
                 <div class="top">
                   <img
                     class="avatar"
-                    src={withBase(p.data.photo ?? "uploads/placeholder.jpg")}
+                    src={assetPath(p.data.photo ?? "placeholder.jpg")}
                     alt={`${p.data.name} headshot`}
                     loading="lazy"
                     data-fallback={placeholderImage}
@@ -615,7 +563,7 @@ const placeholderImage = `${base}uploads/placeholder.jpg`;
                       {p.data.links?.scholar_preview_image ? (
                         <img
                           class="scholarPreviewImage"
-                          src={withBase(p.data.links.scholar_preview_image)}
+                          src={assetPath(p.data.links.scholar_preview_image)}
                           alt={`${p.data.name} Google Scholar preview`}
                           loading="lazy"
                           data-fallback={placeholderImage}
@@ -670,32 +618,7 @@ const placeholderImage = `${base}uploads/placeholder.jpg`;
   })}
 </main>
 
-<footer class="footer">
-  <div class="footerRow">
-    <div class="footerBrand">
-      <img class="footerLogo" src={`${base}uploads/logo.png`} alt="Systems Structural Biology Group logo" />
-      <div>© {new Date().getFullYear()} Systems Structural Biology Group</div>
-    </div>
-    <div class="footerLinks">
-      <a href={`${base}people`}>People</a>
-      <a href={`${base}publications`}>Publications</a>
-      <a href={`${base}join`}>Join</a>
-      <a href={`${base}contact`}>Contact</a>
-    </div>
-  </div>
-</footer>
-
 <script>
-  const btn = document.querySelector("[data-menu-btn]");
-  const nav = document.querySelector("[data-nav]");
-
-  if (btn && nav) {
-    btn.addEventListener("click", () => {
-      const isOpen = nav.classList.toggle("open");
-      btn.setAttribute("aria-expanded", String(isOpen));
-    });
-  }
-
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-toggle]");
     if (!t) return;
@@ -708,3 +631,4 @@ const placeholderImage = `${base}uploads/placeholder.jpg`;
     t.textContent = isClamped ? "Read more" : "Read less";
   });
 </script>
+</SiteLayout>

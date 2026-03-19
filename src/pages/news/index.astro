@@ -1,0 +1,256 @@
+---
+import { getCollection } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { uploadPath } from "../../lib/site";
+
+const base = import.meta.env.BASE_URL;
+const newsEntries = (await getCollection("news")).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+
+const formatDate = (date) =>
+  date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const featured = newsEntries.find((entry) => entry.data.featured) ?? newsEntries[0];
+const remaining = newsEntries.filter((entry) => entry.id !== featured?.id);
+const assetPath = (path = "") => uploadPath(base, path);
+---
+
+<style>
+  .wrap{
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 2.2rem 1.25rem 3.2rem;
+  }
+
+  .hero{
+    border-radius: 28px;
+    padding: 2.5rem 2.2rem;
+    background:
+      radial-gradient(1100px 500px at 10% 0%, rgba(99,102,241,.24), transparent 55%),
+      radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.22), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 18px 46px rgba(0,0,0,.08);
+  }
+  .kicker{
+    font-size: .92rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.55);
+    margin: 0 0 .55rem;
+  }
+  h1{
+    margin: 0;
+    font-size: 3rem;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+  .lead{
+    margin: .9rem 0 0;
+    max-width: 74ch;
+    font-size: 1.16rem;
+    line-height: 1.65;
+    color: rgba(0,0,0,.72);
+  }
+
+  .section{
+    margin-top: 1.4rem;
+  }
+  .featuredCard,
+  .newsCard{
+    border-radius: 24px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 12px 28px rgba(0,0,0,.07);
+  }
+  .featuredCard{
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    overflow: hidden;
+  }
+  .featuredBody{
+    padding: 1.45rem;
+  }
+  .featuredMedia{
+    min-height: 280px;
+    background: linear-gradient(180deg, rgba(243,247,255,.9), rgba(255,255,255,.75));
+  }
+  .featuredMedia img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .eyebrow,
+  .meta{
+    font-size: .92rem;
+    color: rgba(0,0,0,.56);
+  }
+  .eyebrow{
+    margin: 0 0 .65rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+  .featuredTitle,
+  .newsTitle{
+    margin: 0;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .summary{
+    margin: .75rem 0 0;
+    color: rgba(0,0,0,.72);
+    font-size: 1.04rem;
+    line-height: 1.68;
+  }
+  .meta{
+    margin: .9rem 0 0;
+    display: flex;
+    gap: .7rem;
+    flex-wrap: wrap;
+  }
+  .tagRow{
+    display: flex;
+    gap: .55rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .tag{
+    padding: .42rem .72rem;
+    border-radius: 999px;
+    background: rgba(0,0,0,.04);
+    border: 1px solid rgba(0,0,0,.07);
+    color: rgba(0,0,0,.68);
+    font-size: .94rem;
+  }
+  .btn{
+    display: inline-flex;
+    margin-top: 1.1rem;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 700;
+    color: rgba(255,255,255,.96);
+    background: rgba(0,0,0,.92);
+    border: 1px solid rgba(0,0,0,.92);
+    border-radius: 999px;
+    padding: .72rem 1.02rem;
+  }
+
+  .listGrid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
+    margin-top: 1.2rem;
+  }
+  .newsCard{
+    padding: 1.2rem;
+  }
+  .newsTitle{
+    font-size: 1.3rem;
+  }
+  .newsCard a{
+    color: inherit;
+    text-decoration: none;
+  }
+  .newsCard a:hover .newsTitle{
+    text-decoration: underline;
+  }
+
+  .empty{
+    padding: 1.3rem;
+    color: rgba(0,0,0,.68);
+  }
+
+  @media (max-width: 980px){
+    .featuredCard{ grid-template-columns: 1fr; }
+    .listGrid{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px){
+    .wrap{ padding: 1.6rem 1rem 2.8rem; }
+    .hero{ padding: 2rem 1.35rem; }
+    h1{ font-size: 2.35rem; }
+  }
+</style>
+
+<SiteLayout title="News | Systems Structural Biology Group">
+  <main class="wrap">
+    <section class="hero">
+      <p class="kicker">News</p>
+      <h1>Updates from the lab.</h1>
+      <p class="lead">
+        Follow announcements, research highlights, website updates, and milestones across the
+        Systems Structural Biology Group.
+      </p>
+    </section>
+
+    {featured && (
+      <section class="section" aria-label="Featured news">
+        <article class="featuredCard">
+          <div class="featuredBody">
+            <p class="eyebrow">Featured story</p>
+            <h2 class="featuredTitle">{featured.data.title}</h2>
+            <p class="summary">{featured.data.summary}</p>
+            <div class="meta">
+              <span>{formatDate(featured.data.publishedAt)}</span>
+              {featured.data.category && <span>{featured.data.category}</span>}
+            </div>
+            {featured.data.tags && (
+              <div class="tagRow">
+                {featured.data.tags.map((tag) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )}
+            <a class="btn" href={`${base}/news/${featured.slug}`}>Read article</a>
+          </div>
+
+          <div class="featuredMedia">
+            {featured.data.heroImage && (
+              <img
+                src={assetPath(featured.data.heroImage)}
+                alt={featured.data.heroAlt ?? featured.data.title}
+                loading="lazy"
+              />
+            )}
+          </div>
+        </article>
+      </section>
+    )}
+
+    <section class="section" aria-label="All news">
+      {remaining.length > 0 ? (
+        <div class="listGrid">
+          {remaining.map((entry) => (
+            <article class="newsCard">
+              <a href={`${base}/news/${entry.slug}`}>
+                <h2 class="newsTitle">{entry.data.title}</h2>
+              </a>
+              <div class="meta">
+                <span>{formatDate(entry.data.publishedAt)}</span>
+                {entry.data.category && <span>{entry.data.category}</span>}
+              </div>
+              <p class="summary">{entry.data.summary}</p>
+              {entry.data.tags && (
+                <div class="tagRow">
+                  {entry.data.tags.map((tag) => (
+                    <span class="tag">{tag}</span>
+                  ))}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="featuredCard empty">No additional news items yet.</div>
+      )}
+    </section>
+  </main>
+</SiteLayout>

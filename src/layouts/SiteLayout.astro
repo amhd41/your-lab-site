@@ -1,0 +1,274 @@
+---
+import { SITE_NAME, footerLinks, isActiveHref, navLinkDefs, uploadPath, withBase } from "../lib/site";
+
+interface Props {
+  title?: string;
+}
+
+const { title = SITE_NAME } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const pathname = Astro.url.pathname;
+const navItems = navLinkDefs.map((item) => ({
+  ...item,
+  href: withBase(base, item.path),
+}));
+const footerItems = footerLinks.map((item) => ({
+  ...item,
+  href: withBase(base, item.path),
+}));
+const logoSrc = uploadPath(base, "logo.png");
+const faviconSvg = withBase(base, "/favicon.svg");
+const faviconIco = withBase(base, "/favicon.ico");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href={faviconSvg} />
+    <link rel="icon" href={faviconIco} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="navWrap">
+        <a class="brand" href={withBase(base, "/")}>
+          <span class="logoWrap" aria-hidden="true">
+            <img class="logo" src={logoSrc} alt="" />
+          </span>
+          <span class="brandText"><strong>Systems</strong> Structural Biology Group</span>
+        </a>
+
+        <button class="menuBtn" type="button" data-menu-btn aria-expanded="false" aria-controls="mainnav">
+          Menu
+        </button>
+
+        <nav id="mainnav" class="navLinks" aria-label="Main navigation" data-nav>
+          {navItems.map((item) => (
+            <a class={`navA ${isActiveHref(base, pathname, item.href) ? "active" : ""}`} href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="footer">
+      <div class="footerRow">
+        <div class="footerBrand">
+          <img class="footerLogo" src={logoSrc} alt={`${SITE_NAME} logo`} />
+          <div>© {new Date().getFullYear()} {SITE_NAME}</div>
+        </div>
+        <div class="footerLinks">
+          {footerItems.map((item) => (
+            <a href={item.href}>{item.label}</a>
+          ))}
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const btn = document.querySelector("[data-menu-btn]");
+      const nav = document.querySelector("[data-nav]");
+      if (btn && nav) {
+        btn.addEventListener("click", () => {
+          const isOpen = nav.classList.toggle("open");
+          btn.setAttribute("aria-expanded", String(isOpen));
+        });
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  :global(html) { font-family: Arial, Helvetica, sans-serif; }
+  :global(body) { background: #f6f7fb; margin: 0; color: rgba(0,0,0,.92); }
+
+  .topbar{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(246,247,251,.78);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0,0,0,.06);
+  }
+  .navWrap{
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: .9rem 1.25rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .brand{
+    display:inline-flex;
+    align-items:center;
+    gap:.75rem;
+    text-decoration:none;
+    color: rgba(0,0,0,.92);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-size: 1.08rem;
+    white-space: nowrap;
+    outline: none;
+  }
+  .brandText strong { font-weight: 900; }
+
+  .logoWrap{
+    position: relative;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    padding: 3px;
+    background:
+      radial-gradient(24px 24px at 30% 20%, rgba(99,102,241,.40), transparent 65%),
+      radial-gradient(28px 28px at 80% 30%, rgba(56,189,248,.35), transparent 60%),
+      radial-gradient(30px 30px at 60% 85%, rgba(16,185,129,.28), transparent 62%),
+      rgba(255,255,255,.60);
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 10px 18px rgba(0,0,0,.10);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    transform-style: preserve-3d;
+    flex: 0 0 auto;
+  }
+  .logo{
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+    border: 1px solid rgba(0,0,0,.10);
+    background: rgba(255,255,255,.80);
+    transition: transform .18s ease, filter .18s ease;
+  }
+  .logoWrap::after{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(99,102,241,.28), transparent 55%),
+      radial-gradient(circle at 80% 30%, rgba(56,189,248,.22), transparent 55%),
+      radial-gradient(circle at 60% 85%, rgba(16,185,129,.18), transparent 55%);
+    opacity: 0;
+    filter: blur(6px);
+    transition: opacity .18s ease;
+    pointer-events: none;
+  }
+  .brand:hover .logoWrap,
+  .brand:focus-visible .logoWrap{
+    transform: translateY(-1px) rotateX(6deg) rotateY(-8deg);
+    border-color: rgba(0,0,0,.14);
+    box-shadow: 0 16px 30px rgba(0,0,0,.16);
+  }
+  .brand:hover .logo,
+  .brand:focus-visible .logo{
+    transform: scale(1.02);
+    filter: saturate(1.08) contrast(1.04);
+  }
+  .brand:hover .logoWrap::after,
+  .brand:focus-visible .logoWrap::after{
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .logoWrap, .logo, .logoWrap::after { transition: none; }
+    .brand:hover .logoWrap, .brand:focus-visible .logoWrap { transform: none; }
+  }
+
+  .navLinks{
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .navA{
+    text-decoration: none;
+    font-size: 0.98rem;
+    padding: .45rem .72rem;
+    border-radius: 999px;
+    color: rgba(0,0,0,.78);
+    border: 1px solid transparent;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+  }
+  .navA:hover {
+    background: rgba(0,0,0,.04);
+    border-color: rgba(0,0,0,.07);
+    transform: translateY(-1px);
+  }
+  .navA.active {
+    background: rgba(0,0,0,.06);
+    border-color: rgba(0,0,0,.10);
+    color: rgba(0,0,0,.9);
+    font-weight: 700;
+  }
+
+  .menuBtn {
+    display: none;
+    border: 1px solid rgba(0,0,0,.10);
+    background: rgba(255,255,255,.85);
+    border-radius: 999px;
+    padding: .5rem .75rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .footer{
+    margin-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,.06);
+    background: rgba(255,255,255,.6);
+  }
+  .footerRow{
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem 2rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .footerBrand{
+    display:flex;
+    align-items:center;
+    gap:.75rem;
+    color: rgba(0,0,0,.65);
+  }
+  .footerLogo{
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 6px 14px rgba(0,0,0,.08);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .footerBrand:hover .footerLogo{
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(0,0,0,.12);
+  }
+  .footerLinks{
+    display: flex;
+    gap: .9rem;
+    flex-wrap: wrap;
+  }
+  .footerLinks a{
+    color: rgba(0,0,0,.65);
+    text-decoration: none;
+  }
+  .footerLinks a:hover{ text-decoration: underline; }
+
+  @media (max-width: 820px) {
+    .menuBtn { display: inline-flex; align-items: center; gap: .45rem; }
+    .navLinks { display: none; width: 100%; margin-top: .75rem; }
+    .navLinks.open { display: flex; }
+    .navWrap { flex-wrap: wrap; align-items: flex-start; }
+  }
+</style>

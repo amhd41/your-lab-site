@@ -1,0 +1,236 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { withBase as withSiteBase } from "../../lib/site";
+
+const base = import.meta.env.BASE_URL;
+const withBase = (path = "") => withSiteBase(base, path);
+
+const contactMethods = [
+  {
+    label: "Principal Investigator",
+    value: "Abhishek Singharoy",
+    detail: "asinghar@asu.edu",
+    href: "mailto:asinghar@asu.edu",
+  },
+  {
+    label: "General website inquiries",
+    value: "Lab communications",
+    detail: "Use email for collaboration, recruiting, or website questions.",
+    href: "mailto:asinghar@asu.edu?subject=Lab%20Website%20Inquiry",
+  },
+];
+
+const quickLinks = [
+  { label: "People", href: withBase("/people") },
+  { label: "Research", href: withBase("/research") },
+  { label: "Projects", href: withBase("/projects") },
+  { label: "News", href: withBase("/news") },
+];
+---
+
+<style>
+  .wrap{
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 2.2rem 1.25rem 3.2rem;
+  }
+  .hero{
+    border-radius: 28px;
+    padding: 2.6rem 2.2rem;
+    background:
+      radial-gradient(1200px 520px at 8% 0%, rgba(56,189,248,.22), transparent 55%),
+      radial-gradient(900px 520px at 100% 0%, rgba(99,102,241,.20), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 18px 46px rgba(0,0,0,.08);
+  }
+  .kicker{
+    font-size: .92rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.55);
+    margin: 0 0 .55rem;
+  }
+  h1{
+    margin: 0;
+    font-size: 3rem;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+  .lead{
+    margin: .9rem 0 0;
+    max-width: 70ch;
+    color: rgba(0,0,0,.72);
+    line-height: 1.68;
+    font-size: 1.15rem;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 1.2rem;
+    margin-top: 1.3rem;
+  }
+  .stack{
+    display:grid;
+    gap: 1.2rem;
+  }
+  .card{
+    border-radius: 24px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 12px 28px rgba(0,0,0,.07);
+    padding: 1.3rem;
+  }
+  .card h2{
+    margin: 0 0 .8rem;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+  }
+  .card p{
+    margin: 0;
+    color: rgba(0,0,0,.74);
+    line-height: 1.7;
+    font-size: 1.03rem;
+  }
+  .contactList{
+    display:grid;
+    gap: .9rem;
+  }
+  .contactItem{
+    padding: 1rem;
+    border-radius: 18px;
+    background: rgba(0,0,0,.03);
+    border: 1px solid rgba(0,0,0,.05);
+  }
+  .contactItem a{
+    color: inherit;
+    text-decoration: none;
+  }
+  .contactItem a:hover .contactValue{
+    text-decoration: underline;
+  }
+  .contactLabel{
+    margin: 0 0 .3rem;
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: rgba(0,0,0,.52);
+  }
+  .contactValue{
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(0,0,0,.9);
+  }
+  .contactDetail{
+    margin-top: .35rem;
+  }
+  .linkGrid{
+    display:grid;
+    gap:.8rem;
+    margin-top: .95rem;
+  }
+  .quickLink{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    text-decoration:none;
+    color: rgba(0,0,0,.84);
+    padding:.9rem 1rem;
+    border-radius: 16px;
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(0,0,0,.08);
+  }
+  .quickLink:hover{
+    background: rgba(0,0,0,.03);
+  }
+  .btn{
+    display:inline-flex;
+    margin-top: 1rem;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    font-weight:700;
+    border-radius:999px;
+    padding:.72rem 1.02rem;
+    border:1px solid rgba(0,0,0,.10);
+    background: rgba(0,0,0,.92);
+    color: rgba(255,255,255,.96);
+  }
+
+  @media (max-width: 980px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px){
+    .wrap{ padding: 1.6rem 1rem 2.8rem; }
+    .hero{ padding: 2rem 1.35rem; }
+    h1{ font-size: 2.3rem; }
+  }
+</style>
+
+<SiteLayout title="Contact | Systems Structural Biology Group">
+  <main class="wrap">
+    <section class="hero">
+      <p class="kicker">Contact</p>
+      <h1>Get in touch with the lab.</h1>
+      <p class="lead">
+        Reach out for collaboration opportunities, research questions, recruiting inquiries,
+        or general information about the Systems Structural Biology Group.
+      </p>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <article class="card">
+          <h2>Contact methods</h2>
+          <div class="contactList">
+            {contactMethods.map((item) => (
+              <div class="contactItem">
+                <p class="contactLabel">{item.label}</p>
+                <a href={item.href}>
+                  <p class="contactValue">{item.value}</p>
+                </a>
+                <p class="contactDetail">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Prospective students and collaborators</h2>
+          <p>
+            If you are interested in joining the lab or starting a collaboration, it helps to include
+            a short message about your interests, background, and the kind of work you would like to discuss.
+          </p>
+          <a class="btn" href={withBase("/join")}>See joining information</a>
+        </article>
+      </div>
+
+      <div class="stack">
+        <article class="card">
+          <h2>Quick links</h2>
+          <p>
+            If you are looking for a specific part of the site, these pages are usually the best starting points.
+          </p>
+          <div class="linkGrid">
+            {quickLinks.map((item) => (
+              <a class="quickLink" href={item.href}>
+                <span>{item.label}</span>
+                <span>Open</span>
+              </a>
+            ))}
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Primary email</h2>
+          <p>
+            For the fastest response, use email and include any relevant context or links in your first message.
+          </p>
+          <a class="btn" href="mailto:asinghar@asu.edu">asinghar@asu.edu</a>
+        </article>
+      </div>
+    </section>
+  </main>
+</SiteLayout>
