@@ -7,7 +7,7 @@ bio: "Associate Research Scientist at the ASU Biodesign Institute (Center for Ap
 links:
   email: "mdemir@asu.edu"
   scholar: "https://scholar.google.com/citations?user=X41iFxEAAAAJ&hl=en&oi=ao"
-  github: "https://github.com/"
   linkedin: "https://www.linkedin.com/in/caleb-j-armstrong-md/"
+  website: "https://mustafademiriron.github.io/carmstrong/"
 ---
 

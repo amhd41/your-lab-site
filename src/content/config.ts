@@ -14,6 +14,7 @@ const people = defineCollection({
         scholar: z.string().optional(),
         github: z.string().optional(),
         linkedin: z.string().optional(),
+        website: z.string().optional(),
       })
       .optional(),
   }),
