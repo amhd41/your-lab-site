@@ -2,13 +2,19 @@
 // src/pages/people.astro
 import { getCollection } from "astro:content";
 import SiteLayout from "../../layouts/SiteLayout.astro";
-import { uploadPath } from "../../lib/site";
+import { uploadPath, withBase as withSiteBase } from "../../lib/site";
 
 const peopleEntries = await getCollection("people");
 
 /** --- Categorization rules (edit keywords anytime) --- */
-function categorize(role = "") {
+function categorize(person) {
+  const role = typeof person === "string" ? person : person?.data?.role ?? "";
   const r = role.toLowerCase();
+
+  if (
+    typeof person !== "string" &&
+    (person?.data?.alumni || r.includes("alumni") || r.includes("alumnus") || r.includes("alumna"))
+  ) return "Alumni";
 
   if (
     r.includes("principal investigator") ||
@@ -49,23 +55,31 @@ const grouped = {
   "Senior Personnel": [],
   "Graduate Students": [],
   "Undergraduate Assistants": [],
+  "Alumni": [],
   "Other": [],
 };
 
 for (const p of peopleEntries) {
-  grouped[categorize(p.data.role)]?.push(p);
+  grouped[categorize(p)]?.push(p);
 }
 
 for (const k of Object.keys(grouped)) {
   grouped[k].sort((a, b) => (a.data.name ?? "").localeCompare(b.data.name ?? ""));
 }
 
-const sectionOrder = ["Senior Personnel", "Graduate Students", "Undergraduate Assistants", "Other"];
+const sectionOrder = ["Senior Personnel", "Graduate Students", "Undergraduate Assistants", "Other", "Alumni"];
 const showOther = grouped["Other"].length > 0;
 
 const base = import.meta.env.BASE_URL;
 const assetPath = (path = "") => uploadPath(base, path);
+const withBase = (path = "") => withSiteBase(base, path);
 const placeholderImage = assetPath("logo.png");
+
+const projectTopicLinks = [
+  { label: "Structural biology", href: withBase("/projects#topic-structural-biology") },
+  { label: "Complex systems", href: withBase("/projects#topic-complex-systems") },
+  { label: "Human-centered data science", href: withBase("/projects#topic-human-centered-data-science") },
+];
 ---
 
 <style>
@@ -276,6 +290,17 @@ const placeholderImage = assetPath("logo.png");
     border: 1px solid rgba(0,0,0,.10);
     background: rgba(255,255,255,.75);
     color: rgba(0,0,0,.72);
+  }
+
+  .topicLink {
+    text-decoration: none;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+
+  .topicLink:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0,0,0,.18);
+    background: rgba(255,255,255,.95);
   }
 
   .section { margin-top: 1.75rem; }
@@ -496,6 +521,40 @@ const placeholderImage = assetPath("logo.png");
   .footerLinks { display: flex; gap: .9rem; flex-wrap: wrap; }
   .footerLinks a { color: rgba(0,0,0,.65); text-decoration: none; }
   .footerLinks a:hover { text-decoration: underline; }
+
+  .sectionNote {
+    margin: .25rem 0 0;
+    color: rgba(0,0,0,.58);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .alumniNow {
+    margin: 1rem 0 .2rem;
+    padding: .85rem 1rem;
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 12% 20%, rgba(16,185,129,.14), transparent 45%),
+      rgba(0,0,0,.03);
+    border: 1px solid rgba(0,0,0,.06);
+  }
+
+  .alumniLabel {
+    margin: 0 0 .25rem;
+    font-size: .8rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.52);
+    font-weight: 800;
+  }
+
+  .alumniAssociation {
+    margin: 0;
+    color: rgba(0,0,0,.78);
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 700;
+  }
 </style>
 
 <SiteLayout title="People | Systems Structural Biology Group">
@@ -505,26 +564,41 @@ const placeholderImage = assetPath("logo.png");
     <h1>People</h1>
     <p class="sub">Human-centered AI science for structural discovery and complex systems.</p>
     <div class="chips">
-      <span class="chip">Structural biology</span>
-      <span class="chip">Complex systems</span>
-      <span class="chip">Human-centered data science</span>
+      {projectTopicLinks.map((topic) => (
+        <a class="chip topicLink" href={topic.href}>{topic.label}</a>
+      ))}
     </div>
   </section>
 
   {sectionOrder.map((sectionName) => {
     if (sectionName === "Other" && !showOther) return null;
     const sectionPeople = grouped[sectionName] ?? [];
-    if (sectionPeople.length === 0) return null;
+    if (sectionPeople.length === 0 && sectionName !== "Alumni") return null;
 
     return (
       <section class="section">
         <div class="sectionHead">
-          <h2 class="sectionTitle">{sectionName}</h2>
+          <div>
+            <h2 class="sectionTitle">{sectionName}</h2>
+            {sectionName === "Alumni" && (
+              <p class="sectionNote">Former lab members and their current affiliations.</p>
+            )}
+          </div>
           <p class="count">{sectionPeople.length} member{sectionPeople.length === 1 ? "" : "s"}</p>
         </div>
 
         <div class="grid">
-          {sectionPeople.map((p) => (
+          {sectionPeople.length === 0 && sectionName === "Alumni" ? (
+            <article class="card alumniEmpty">
+              <div class="cardInner">
+                <h3 class="name">Alumni profiles coming soon</h3>
+                <p class="bio">
+                  Add <code>alumni: true</code> and <code>currentAssociation</code> to a person profile to show
+                  former lab members and where they are currently associated.
+                </p>
+              </div>
+            </article>
+          ) : sectionPeople.map((p) => (
             <article class="card">
               <div class="cardInner">
                 <div class="top">
@@ -541,6 +615,13 @@ const placeholderImage = assetPath("logo.png");
                     <span class="role">{p.data.role}</span>
                   </div>
                 </div>
+
+                {sectionName === "Alumni" && p.data.currentAssociation && (
+                  <div class="alumniNow">
+                    <p class="alumniLabel">Current association</p>
+                    <p class="alumniAssociation">{p.data.currentAssociation}</p>
+                  </div>
+                )}
 
                 {p.data.bio && (
                   <>

@@ -8,6 +8,8 @@ const people = defineCollection({
     role: z.string(),
     bio: z.string().optional(),
     photo: z.string().optional(),
+    alumni: z.boolean().default(false),
+    currentAssociation: z.string().optional(),
     links: z
       .object({
         email: z.string().optional(),
