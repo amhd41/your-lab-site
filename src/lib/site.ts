@@ -3,7 +3,6 @@ export const SITE_NAME = "Systems Structural Biology Group";
 export const footerLinks = [
   { label: "People", path: "/people" },
   { label: "Publications", path: "/publications" },
-  { label: "Site Map", path: "/site-map" },
   { label: "Join", path: "/join" },
   { label: "Contact", path: "/contact" },
 ];
@@ -15,7 +14,6 @@ export const navLinkDefs = [
   { label: "Projects", path: "/projects" },
   { label: "Publications", path: "/publications" },
   { label: "News", path: "/news" },
-  { label: "Site Map", path: "/site-map" },
   { label: "Join", path: "/join" },
   { label: "Contact", path: "/contact" },
 ];
